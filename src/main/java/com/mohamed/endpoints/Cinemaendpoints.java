@@ -11,7 +11,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.util.Locale;
 
 @Path("/api")
 public class Cinemaendpoints {
@@ -25,11 +29,12 @@ public class Cinemaendpoints {
     @Transactional
     public Response saveCinema(){
         Cinema cinema=new Cinema();
-        Faker faker=new Faker();
-        cinema.setAddress(faker.address().buildingNumber()+" "+faker.address().cityName()+" "+faker.address().country());
+        Faker faker=new Faker(new Locale("DE"));
+        cinema.setAddress(faker.address().buildingNumber()+" "+faker.address().streetAddress()+" "+faker.address().cityName()+" "+faker.address().zipCode()+" "+faker.address().country());
         cinema.setCinemaName("CinemaMAXX");
-        LocalDate startDate=LocalDate.of(2021,12,20);
-        LocalDate closeDate=LocalDate.of(2021,12,20);
+        LocalDateTime startDate=LocalDateTime.now();
+
+        LocalDateTime closeDate=startDate.plus(Duration.ofHours(8));
         cinema.setOpen(startDate);
         cinema.setClose(closeDate);
         cinemaRepository.persist(cinema);

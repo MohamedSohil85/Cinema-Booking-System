@@ -16,6 +16,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.time.LocalDateTime;
 
 @Path("/api")
 public class Movieendpoints {
@@ -33,6 +34,9 @@ public class Movieendpoints {
         Movie movie=new Movie();
         movie.setGenre(Genre.ROMANCE);
         movie.setMovieName("Titanic");
+        LocalDateTime localDateTime=LocalDateTime.now();
+        movie.setMovieStart(localDateTime);
+        movie.setMovieend(localDateTime.plusHours(3));
         movie.setPrice(45);
         movie.setCinema(cinema);
         cinema.getMovies().add(movie);

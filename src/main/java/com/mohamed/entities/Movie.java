@@ -12,6 +12,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 @Getter
@@ -24,9 +25,9 @@ public class Movie extends PanacheEntity {
     @NotEmpty(message = "Enter Movie Name")
     private String movieName;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "Europe/Berlin")
-    private LocalDate movieStart;
+    private LocalDateTime movieStart;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "Europe/Berlin")
-    private LocalDate movieend;
+    private LocalDateTime movieend;
     @Enumerated(EnumType.STRING)
     private Genre genre;
     private double price;
@@ -34,9 +35,11 @@ public class Movie extends PanacheEntity {
     @JsonIgnore
     private List<Actors> starring;
     @ManyToOne
+
     private Cinema cinema;
     @OneToOne
     private MovieDetails movieDetails;
-    @OneToMany
+    @OneToMany(mappedBy = "movie",cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Ticket>tickets;
 }

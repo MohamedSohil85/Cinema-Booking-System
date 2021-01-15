@@ -14,6 +14,6 @@ import java.util.Date;
 public class ErrorMessage {
 
     private String error;
-    private Date date;
+
 
 }

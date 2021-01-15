@@ -4,7 +4,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
-import java.util.Date;
+
 
 @Provider
 public class UserWebServiceExceptionHandler implements ExceptionMapper<ResourceNotFound> {
@@ -12,7 +12,7 @@ public class UserWebServiceExceptionHandler implements ExceptionMapper<ResourceN
     public Response toResponse(ResourceNotFound exception) {
         return Response
                 .status(Response.Status.NO_CONTENT)
-                .entity(new ErrorMessage(exception.getMessage(),new Date()))
+                .entity(new ErrorMessage(exception.getMessage()))
                 .type(MediaType.APPLICATION_JSON).build();
     }
 }

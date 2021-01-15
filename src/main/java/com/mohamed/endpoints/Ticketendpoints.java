@@ -26,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.nio.file.FileSystems;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -53,58 +54,55 @@ public class Ticketendpoints {
         if(tickets.isEmpty()){
             throw new ResourceNotFound("Object not found");
         }
-        return tickets.stream().sorted().collect(Collectors.toList());
+        return tickets;
     }
+
+
+
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    @Path("/Ticket/{movieId}")
-    public Response saveTicket(@PathParam("movieId")Long movieId,Ticket ticket)throws ResourceNotFound{
-        return movieRepository.findByIdOptional(movieId).map(movie -> {
-
-            for(int i=0;i<Constants.seat_number_per_row;i++){
-                for(int j=0;j<Constants.row_number;j++)
-                ticket.setRow(j);
-                ticket.setSeatNumber(i);
-                ticket.setSeatStatus(SeatStatus.available);
-                ticket.setMovie(movie);
-                movie.getTickets().add(ticket);
-                ticketRepository.persist(ticket);
-
-            }
-            return Response.status(Response.Status.CREATED).build();
-        }).orElseThrow(()->new ResourceNotFound("Object not found!"));
-    }
-
-    @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Transactional
-    @Path("/Ticket/{ticketId}/VisitorId/{visitorId}/Movie/{movieId}")
-    public Response sellTicket(@PathParam("ticketId")Long ticketId,@PathParam("visitorId")Long visitorId,@PathParam("movieId")Long movieId) throws ResourceNotFound{
+    @Path("/Ticket/VisitorId/{visitorId}/Movie/{movieId}")
+    public Response sellTicket(@PathParam("visitorId")Long visitorId,@PathParam("movieId")Long movieId,Ticket ticket) throws ResourceNotFound, IOException, WriterException {
        Movie movie=movieRepository.findByIdOptional(movieId).orElseThrow(()->new ResourceNotFound("Object not found"));
-       Ticket ticket=ticketRepository.findByIdOptional(ticketId).orElseThrow(()->new ResourceNotFound("Object not found"));
        Visitor visitor=visitorRepository.findByIdOptional(visitorId).orElseThrow(()->new ResourceNotFound("Object not found"));
-       if(ticket.getSeatStatus().equals(SeatStatus.occupied))
-       {
-           throw new ResourceNotFound("Seat is Occupied");
-       }
+       List<Ticket>tickets=ticketRepository.listAll();
+        int counter=Constants.capacity;
+        for(int i=0;i<tickets.size();i++){
+            if((ticket.getRow()>Constants.row_number)) {
+                return Response.ok("wrong Row !").build();
+            }
+                if ((tickets.get(i).getSeatNumber() == ticket.getSeatNumber()) && (tickets.get(i).getRow()==ticket.getRow()))
+                {
+                return Response.ok("Wrong SeatNr.,or Occupied !").build();
+            }
+                if(ticket.getCapatcity()>0){
+                counter--;
+                 ticket.setCapatcity(counter);}
+        }
+
+
+
+        ticket.setSeatStatus(SeatStatus.occupied);
+
         visitor.getTickets().add(ticket);
         movie.getTickets().add(ticket);
-       ticket.setSeatStatus(SeatStatus.occupied);
-       ticket.setVisitor(visitor);
-
+        ticket.setSeatStatus(SeatStatus.occupied);
+        ticket.setVisitor(visitor);
+         ticket.setMovie(movie);
+        barcodeGenerator(ticket);
        ticketRepository.persist(ticket);
 
-        return Response.status(Response.Status.CREATED).build();
+        return Response.ok(ticket).build();
     }
     public String  barcodeGenerator(@Valid Ticket data ) throws WriterException, IOException {
 
 
         String qcodePath = "C:\\Users\\Mimo\\Desktop\\Tickets"+"-BRCode.png";
         PDF417Writer pdf417Writer = new PDF417Writer();
-        BitMatrix bitMatrix = pdf417Writer.encode("Movie :"+data.getMovie()+"\n"+
-                "Row :"+data.getRow()+"\n"+"Seat.Nr :"+data.getSeatNumber()+"\n"+"Visitor :"+data.getVisitor()
+        BitMatrix bitMatrix = pdf417Writer.encode("Movie :"+data.getMovie().getMovieName()+"\n"+
+                "Row :"+data.getRow()+"\n"+"Seat.Nr :"+data.getSeatNumber()+"\n"+"Visitor :"+data.getVisitor().getLastName()
                 , BarcodeFormat.PDF_417, 350, 350);
         java.nio.file.Path path = FileSystems.getDefault().getPath(qcodePath);
         MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
@@ -112,20 +110,16 @@ public class Ticketendpoints {
         return "\\Tickets\\"+data.getMovie()+ "-BRCode.png";
 
     }
-    @GET
+    @DELETE
+    @Path("/deleteAllTickets")
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/findSeatByMovieName/{movieName}")
-    public Response findSeat(@PathParam("movieName")String movieName)throws ResourceNotFound{
-        Predicate<Ticket>ticketPredicate=movies-> movies.getSeatStatus().equals(SeatStatus.available);
-
-        List<Ticket>tickets=ticketRepository
-                .listAll()
-                .stream()
-                .filter(ticket -> ticket.getMovie().getMovieName().equalsIgnoreCase(movieName)).filter(ticketPredicate).collect(Collectors.toList());
-        if (tickets.isEmpty()){
-            throw new ResourceNotFound("Object not found");
+    @Transactional
+    public Response deleteTickets(){
+        List<Ticket>tickets=ticketRepository.listAll();
+        if(tickets.isEmpty()){
+            return Response.noContent().build();
         }
-        return Response.ok(tickets).build();
+         Ticket.deleteAll();
+        return Response.ok("all Objects deleted !").build();
     }
-
 }

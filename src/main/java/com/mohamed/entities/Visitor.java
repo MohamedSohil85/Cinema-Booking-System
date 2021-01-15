@@ -1,5 +1,6 @@
 package com.mohamed.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +35,7 @@ public class Visitor extends PanacheEntity {
     private String token;
     @OneToOne
     private Payment payment;
+    @JsonIgnore
     @OneToMany
     private List<Ticket>tickets;
 }

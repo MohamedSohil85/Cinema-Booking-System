@@ -9,7 +9,10 @@ import lombok.Setter;
 
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 @Getter
 @Setter
@@ -19,10 +22,12 @@ import java.util.List;
 public class Cinema extends PanacheEntity {
     private String cinemaName;
     private String address;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "Europe/Berlin")
-    private LocalDate open;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "Europe/Berlin")
-    private LocalDate close;
+
+    //@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "Europe/Berlin")
+    private LocalDateTime open;
+
+   // @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "Europe/Berlin")
+    private LocalDateTime close;
     @OneToMany
     private List<Movie> movies;
 
