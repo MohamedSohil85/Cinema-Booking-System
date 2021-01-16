@@ -35,7 +35,7 @@ public class Movie extends PanacheEntity {
     @JsonIgnore
     private List<Actors> starring;
     @ManyToOne
-
+@JsonIgnore
     private Cinema cinema;
     @OneToOne
     private MovieDetails movieDetails;

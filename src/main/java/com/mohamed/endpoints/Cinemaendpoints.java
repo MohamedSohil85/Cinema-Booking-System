@@ -30,7 +30,8 @@ public class Cinemaendpoints {
     public Response saveCinema(){
         Cinema cinema=new Cinema();
         Faker faker=new Faker(new Locale("DE"));
-        cinema.setAddress(faker.address().buildingNumber()+" "+faker.address().streetAddress()+" "+faker.address().cityName()+" "+faker.address().zipCode()+" "+faker.address().country());
+        cinema.setAddress(faker.address().buildingNumber()+" "+faker.address().streetAddress()+" "+faker.address().cityName()+" "+faker.address().zipCode());
+
         cinema.setCinemaName("CinemaMAXX");
         LocalDateTime startDate=LocalDateTime.now();
 

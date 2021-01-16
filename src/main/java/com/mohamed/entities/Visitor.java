@@ -34,8 +34,9 @@ public class Visitor extends PanacheEntity {
     private String email;
     private String token;
     @OneToOne
+    @JsonIgnore
     private Payment payment;
     @JsonIgnore
-    @OneToMany
+    @OneToMany(mappedBy = "visitor")
     private List<Ticket>tickets;
 }

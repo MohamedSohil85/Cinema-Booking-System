@@ -55,13 +55,14 @@ public class Visitorendpoints {
     @Transactional
     @Path("/Payment/{visitorId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response savePayment(@PathParam("visitorId")Long id, @Valid Payment payment)throws ResourceNotFound{
+    public Response savePayment(@PathParam("visitorId")Long id)throws ResourceNotFound{
         return visitorRepository.findByIdOptional(id).map(visitor -> {
+            Payment payment=new Payment();
             Faker faker=new Faker();
-            payment.setAccountNumber(faker.regexify("[A-Z]{2}\\p{Alnum}{13,30}"));
+            payment.setAccountNumber("DE 51 5444 8444 0000 2145 17");
             payment.setCardholderName(faker.name().fullName());
             payment.setCardType("Paypal");
-            payment.setAccountBic(faker.finance().bic());
+            payment.setAccountBic("125cHHLLXXX");
             payment.setVisitor(visitor);
             visitor.setPayment(payment);
             paymentRepository.persist(payment);

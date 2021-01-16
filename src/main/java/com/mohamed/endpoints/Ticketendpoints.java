@@ -17,6 +17,7 @@ import com.mohamed.repositories.MovieRepository;
 import com.mohamed.repositories.TicketRepository;
 import com.mohamed.repositories.VisitorRepository;
 import io.quarkus.mailer.Mailer;
+import io.quarkus.panache.common.Parameters;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -64,62 +65,76 @@ public class Ticketendpoints {
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
     @Path("/Ticket/VisitorId/{visitorId}/Movie/{movieId}")
-    public Response sellTicket(@PathParam("visitorId")Long visitorId,@PathParam("movieId")Long movieId,Ticket ticket) throws ResourceNotFound, IOException, WriterException {
+    public Response bookTicket(@PathParam("visitorId")Long visitorId,@PathParam("movieId")Long movieId,Ticket ticket) throws ResourceNotFound {
        Movie movie=movieRepository.findByIdOptional(movieId).orElseThrow(()->new ResourceNotFound("Object not found"));
        Visitor visitor=visitorRepository.findByIdOptional(visitorId).orElseThrow(()->new ResourceNotFound("Object not found"));
        List<Ticket>tickets=ticketRepository.listAll();
         int counter=Constants.capacity;
         for(int i=0;i<tickets.size();i++){
             if((ticket.getRow()>Constants.row_number)) {
-                return Response.ok("wrong Row !").build();
+                return Response.ok("wrong Row Number !").build();
             }
-                if ((tickets.get(i).getSeatNumber() == ticket.getSeatNumber()) && (tickets.get(i).getRow()==ticket.getRow()))
+                if ((tickets.get(i).getSeatNumber() == ticket.getSeatNumber())
+                        && (tickets.get(i).getRow()==ticket.getRow())
+                           && (tickets.get(i).getMovie().equals(movie))
+                             || (ticket.getSeatNumber()>Constants.seat_number_per_row))
                 {
-                return Response.ok("Wrong SeatNr.,or Occupied !").build();
+                return Response.ok("Wrong SeatNr.,or the Seat is Occupied !").build();
             }
-                if(ticket.getCapatcity()>0){
-                counter--;
-                 ticket.setCapatcity(counter);}
+                if(!tickets.get(i).getMovie().equals(movie)){
+                   int counter_=ticket.getCapatcity();
+                    counter_--;
+                    ticket.setCapatcity(counter_);
+                }else
+                 counter--;
+                 ticket.setCapatcity(counter);
         }
-
-
-
         ticket.setSeatStatus(SeatStatus.occupied);
-
         visitor.getTickets().add(ticket);
         movie.getTickets().add(ticket);
         ticket.setSeatStatus(SeatStatus.occupied);
         ticket.setVisitor(visitor);
          ticket.setMovie(movie);
-        barcodeGenerator(ticket);
-       ticketRepository.persist(ticket);
 
+       ticketRepository.persist(ticket);
         return Response.ok(ticket).build();
     }
-    public String  barcodeGenerator(@Valid Ticket data ) throws WriterException, IOException {
 
 
-        String qcodePath = "C:\\Users\\Mimo\\Desktop\\Tickets"+"-BRCode.png";
-        PDF417Writer pdf417Writer = new PDF417Writer();
-        BitMatrix bitMatrix = pdf417Writer.encode("Movie :"+data.getMovie().getMovieName()+"\n"+
-                "Row :"+data.getRow()+"\n"+"Seat.Nr :"+data.getSeatNumber()+"\n"+"Visitor :"+data.getVisitor().getLastName()
-                , BarcodeFormat.PDF_417, 350, 350);
-        java.nio.file.Path path = FileSystems.getDefault().getPath(qcodePath);
-        MatrixToImageWriter.writeToPath(bitMatrix, "PNG", path);
 
-        return "\\Tickets\\"+data.getMovie()+ "-BRCode.png";
-
-    }
     @DELETE
-    @Path("/deleteAllTickets")
+    @Path("/cancelBookingByTicketId/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Transactional
-    public Response deleteTickets(){
+    public Response deleteTicket(@PathParam("id")Long id) throws ResourceNotFound{
         List<Ticket>tickets=ticketRepository.listAll();
         if(tickets.isEmpty()){
             return Response.noContent().build();
         }
-         Ticket.deleteAll();
-        return Response.ok("all Objects deleted !").build();
+       Optional<Ticket>ticketOptional=ticketRepository.findByIdOptional(id);
+       if(!ticketOptional.isPresent()){
+           return Response.noContent().build();
+       }
+       Ticket ticket=ticketOptional.get();
+       ticketRepository.deleteById(id);
+       return Response.ok("Ticket of Visitor :"+ticket.getVisitor().getLastName()+ "\n Row.Nr :"+ticket.getRow()+ " and\n Seat Nr. :"+ticket.getSeatNumber()+ " is now available").build();
     }
+
+    @GET
+    @Path("/checkTicketByMovieId/{movieId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public List<Ticket> findTicketsByMovieId(@PathParam("movieId")Long movieId) throws ResourceNotFound{
+        Optional<Movie>movieOptional=movieRepository.findByIdOptional(movieId);
+        if(!movieOptional.isPresent()){
+            throw new ResourceNotFound("Object not found ");
+        }
+        List<Ticket>tickets= ticketRepository.stream("select row , seatNumber ,movie  from Ticket where movie_id = : movieId", Parameters.with("movieId",movieId)).collect(Collectors.toList());
+
+        if (tickets.isEmpty()){
+            throw  new ResourceNotFound("Empty list");
+        }
+        return tickets;
+    }
+
 }

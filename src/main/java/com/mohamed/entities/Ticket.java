@@ -23,7 +23,7 @@ public class Ticket extends PanacheEntity {
     private SeatStatus seatStatus;
     @ManyToOne
     private Movie movie;
-    @OneToOne
+    @ManyToOne
     private Visitor visitor;
     private int capatcity;
 

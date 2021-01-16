@@ -32,12 +32,12 @@ public class Movieendpoints {
     public Response saveNewMovie(@PathParam("cinemaId")Long id) throws ResourceNotFound {
         Cinema cinema=cinemaRepository.findByIdOptional(id).orElseThrow(()->new ResourceNotFound("Object not found"));
         Movie movie=new Movie();
-        movie.setGenre(Genre.ROMANCE);
-        movie.setMovieName("Titanic");
+        movie.setGenre(Genre.FAMILY);
+        movie.setMovieName("Jurassic Park 2");
         LocalDateTime localDateTime=LocalDateTime.now();
         movie.setMovieStart(localDateTime);
         movie.setMovieend(localDateTime.plusHours(3));
-        movie.setPrice(45);
+        movie.setPrice(50);
         movie.setCinema(cinema);
         cinema.getMovies().add(movie);
         movieRepository.persist(movie);
