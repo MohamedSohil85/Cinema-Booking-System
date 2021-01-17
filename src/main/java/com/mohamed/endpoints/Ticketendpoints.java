@@ -1,39 +1,28 @@
 package com.mohamed.endpoints;
 
-import com.github.javafaker.Faker;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.pdf417.PDF417Writer;
 import com.mohamed.entities.Movie;
 import com.mohamed.entities.Ticket;
 import com.mohamed.entities.Visitor;
 import com.mohamed.exceptions.ResourceNotFound;
 import com.mohamed.models.Constants;
 import com.mohamed.models.SeatStatus;
-import com.mohamed.repositories.CinemaRepository;
+
 import com.mohamed.repositories.MovieRepository;
 import com.mohamed.repositories.TicketRepository;
 import com.mohamed.repositories.VisitorRepository;
-import io.quarkus.mailer.Mailer;
+
 import io.quarkus.panache.common.Parameters;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import javax.validation.Valid;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static io.quarkus.hibernate.orm.panache.PanacheEntityBase.listAll;
 
 @Path("/api")
 public class Ticketendpoints {
@@ -44,8 +33,7 @@ public class Ticketendpoints {
     MovieRepository movieRepository;
     @Inject
     VisitorRepository visitorRepository;
-    @Inject
-    Mailer mailer;
+
 
     @GET
     @Path("/Tickets")
@@ -63,6 +51,7 @@ public class Ticketendpoints {
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
     @Transactional
     @Path("/Ticket/VisitorId/{visitorId}/Movie/{movieId}")
     public Response bookTicket(@PathParam("visitorId")Long visitorId,@PathParam("movieId")Long movieId,Ticket ticket) throws ResourceNotFound {
@@ -94,7 +83,7 @@ public class Ticketendpoints {
         movie.getTickets().add(ticket);
         ticket.setSeatStatus(SeatStatus.occupied);
         ticket.setVisitor(visitor);
-         ticket.setMovie(movie);
+        ticket.setMovie(movie);
 
        ticketRepository.persist(ticket);
         return Response.ok(ticket).build();
@@ -129,12 +118,13 @@ public class Ticketendpoints {
         if(!movieOptional.isPresent()){
             throw new ResourceNotFound("Object not found ");
         }
-        List<Ticket>tickets= ticketRepository.stream("select row , seatNumber ,movie  from Ticket where movie_id = : movieId", Parameters.with("movieId",movieId)).collect(Collectors.toList());
+        List<Ticket>tickets= ticketRepository.stream("select row AS Row, seatNumber AS Seat ,movie from Ticket where movie_id = : movieId", Parameters.with("movieId",movieId)).collect(Collectors.toList());
 
         if (tickets.isEmpty()){
             throw  new ResourceNotFound("Empty list");
         }
         return tickets;
     }
+
 
 }

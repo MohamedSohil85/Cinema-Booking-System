@@ -20,9 +20,9 @@ public class Cinema extends PanacheEntity {
 
     private String cinemaName;
     private String address;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "Europe/Berlin")
+    @JsonFormat(pattern = "dd-MM-YYYY HH:mm:ss" ,timezone = "Europe/Berlin")
     private LocalDateTime open;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "Europe/Berlin")
+    @JsonFormat(pattern = "dd-MM-YYYY HH:mm:ss" ,timezone = "Europe/Berlin")
     private LocalDateTime close;
     @OneToMany(mappedBy = "cinema",cascade = CascadeType.ALL)
     private List<Movie> movies;

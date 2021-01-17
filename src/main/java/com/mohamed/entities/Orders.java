@@ -19,6 +19,6 @@ public class Orders extends PanacheEntity {
     @ManyToOne
     private Ticket ticket;
     @Temporal(TemporalType.DATE)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "Europe/Berlin")
+    @JsonFormat(pattern = "dd-MM-YYYY HH:mm:ss" ,timezone = "Europe/Berlin")
     private Date paymentDate;
 }

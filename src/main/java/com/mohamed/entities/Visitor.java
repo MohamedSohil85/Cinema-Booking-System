@@ -13,6 +13,7 @@ import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
 import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor

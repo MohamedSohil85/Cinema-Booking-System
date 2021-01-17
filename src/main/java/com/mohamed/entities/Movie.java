@@ -24,9 +24,9 @@ public class Movie extends PanacheEntity {
 
     @NotEmpty(message = "Enter Movie Name")
     private String movieName;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "Europe/Berlin")
+    @JsonFormat(pattern = "dd-MM-YYYY HH:mm:ss" ,timezone = "Europe/Berlin")
     private LocalDateTime movieStart;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss" ,timezone = "Europe/Berlin")
+    @JsonFormat(pattern = "dd-MM-YYYY HH:mm:ss" ,timezone = "Europe/Berlin")
     private LocalDateTime movieend;
     @Enumerated(EnumType.STRING)
     private Genre genre;
