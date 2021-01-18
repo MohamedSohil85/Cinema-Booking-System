@@ -33,7 +33,7 @@ public class Movieendpoints {
         Cinema cinema=cinemaRepository.findByIdOptional(id).orElseThrow(()->new ResourceNotFound("Object not found"));
         Movie movie=new Movie();
         movie.setGenre(Genre.FAMILY);
-        movie.setMovieName("Jurassic Park 2");
+        movie.setMovieName("Jurassic Park 1");
         LocalDateTime localDateTime=LocalDateTime.now();
         movie.setMovieStart(localDateTime);
         movie.setMovieend(localDateTime.plusHours(3));

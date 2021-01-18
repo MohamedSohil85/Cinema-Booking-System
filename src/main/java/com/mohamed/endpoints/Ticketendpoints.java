@@ -75,6 +75,7 @@ public class Ticketendpoints {
                     counter_--;
                     ticket.setCapatcity(counter_);
                 }else
+
                  counter--;
                  ticket.setCapatcity(counter);
         }

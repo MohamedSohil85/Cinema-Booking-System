@@ -7,6 +7,8 @@ import com.mohamed.repositories.MovieDetailsRepository;
 import com.mohamed.repositories.MovieRepository;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.Optional;
@@ -23,9 +25,9 @@ public class MovieDetailsendpoints {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public MovieDetails saveMovieDetails(@PathParam("movieId")Long movieId,MovieDetails movieDetails) throws ResourceNotFound {
-
-        Optional<Movie>movieOptional=movieRepository.findByIdOptional(movieId);
+    @Transactional
+    public MovieDetails saveMovieDetails(@PathParam("movieId")Long movieId, MovieDetails movieDetails) throws ResourceNotFound {
+         Optional<Movie>movieOptional=movieRepository.findByIdOptional(movieId);
         Movie movie=movieOptional.orElseThrow(()->new ResourceNotFound("Object not found"));
         movieDetails.setMovie(movie);
         movie.setMovieDetails(movieDetails);

@@ -2,7 +2,7 @@ package com.mohamed.models;
 
 public class Constants {
 
-   public  static int capacity=15;
-   public  static int row_number=3;
-   public  static int seat_number_per_row=5;
+   public  static final int capacity=24;
+   public  static final int row_number=3;
+   public  static final int seat_number_per_row=5;
 }

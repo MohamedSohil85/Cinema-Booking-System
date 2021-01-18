@@ -44,7 +44,7 @@ public class OrderEndpoints {
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response sellTicket(@PathParam("ticketId")Long ticketId, @PathParam("paymentId")Long paymentId){
+    public Response buyTicket(@PathParam("ticketId")Long ticketId, @PathParam("paymentId")Long paymentId){
         return ticketRepository.findByIdOptional(ticketId).map(ticket -> {
             Optional<Payment>paymentOptional=paymentRepository.findByIdOptional(paymentId);
             Payment payment=paymentOptional.get();
