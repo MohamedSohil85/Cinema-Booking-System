@@ -55,8 +55,10 @@ public class Ticketendpoints {
     @Transactional
     @Path("/Ticket/VisitorId/{visitorId}/Movie/{movieId}")
     public Response bookTicket(@PathParam("visitorId")Long visitorId,@PathParam("movieId")Long movieId,Ticket ticket) throws ResourceNotFound {
-       Movie movie=movieRepository.findByIdOptional(movieId).orElseThrow(()->new ResourceNotFound("Object not found"));
-       Visitor visitor=visitorRepository.findByIdOptional(visitorId).orElseThrow(()->new ResourceNotFound("Object not found"));
+       Movie movie=movieRepository.findByIdOptional(movieId)
+               .orElseThrow(()->new ResourceNotFound("Object not found"));
+       Visitor visitor=visitorRepository.findByIdOptional(visitorId)
+               .orElseThrow(()->new ResourceNotFound("Object not found"));
        List<Ticket>tickets=ticketRepository.listAll();
         int counter=Constants.capacity;
         for(int i=0;i<tickets.size();i++){
