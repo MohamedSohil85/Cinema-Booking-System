@@ -2,26 +2,33 @@ package com.mohamed.endpoints;
 
 import com.github.javafaker.Faker;
 import com.mohamed.entities.Cinema;
+import com.mohamed.entities.Movie;
+import com.mohamed.exceptions.ResourceNotFound;
 import com.mohamed.repositories.CinemaRepository;
+import com.mohamed.repositories.MovieRepository;
+import io.quarkus.panache.common.Parameters;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Path("/api")
 public class Cinemaendpoints {
 
     @Inject
     CinemaRepository cinemaRepository;
+    @Inject
+    MovieRepository movieRepository;
 
     @Path("/Cinema")
     @POST
@@ -43,5 +50,22 @@ public class Cinemaendpoints {
 
     }
 
+    @GET
+    @Path("/showCinemaProgramm/{cinemaId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public List<Movie> showMoviesByCinemaId(@PathParam("cinemaId")Long cinemaId)throws ResourceNotFound{
+        Optional<Cinema>cinemaOptional =cinemaRepository.findByIdOptional(cinemaId);
+        if (!cinemaOptional.isPresent()){
+            throw new ResourceNotFound("Object not found");
+        }
+        List<Cinema>cinemas=cinemaRepository.listAll();
+        if (cinemas.isEmpty()){
+            throw new ResourceNotFound("List is Empty");
+        }
+        List<Movie>movies=movieRepository.stream("select movieName,movieStart,movieend, genre from movie where cinema_id = :cinemaId", Parameters.with("cinemaId",cinemaId)).collect(Collectors.toList());
+        return movies;
+
+    }
 
 }

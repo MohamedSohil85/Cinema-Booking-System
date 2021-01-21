@@ -62,15 +62,14 @@ public class Ticketendpoints {
        List<Ticket>tickets=ticketRepository.listAll();
         int counter=Constants.capacity;
         for(int i=0;i<tickets.size();i++){
-            if((ticket.getRow()>Constants.row_number)) {
-                return Response.ok("wrong Row Number !").build();
+            if((ticket.getRow()>Constants.row_number) || (ticket.getSeatNumber()>Constants.seat_number_per_row)) {
+                throw new ResourceNotFound("the entered Seat or Row Number not Found");
             }
                 if ((tickets.get(i).getSeatNumber() == ticket.getSeatNumber())
                         && (tickets.get(i).getRow()==ticket.getRow())
-                           && (tickets.get(i).getMovie().equals(movie))
-                             || (ticket.getSeatNumber()>Constants.seat_number_per_row))
+                           && (tickets.get(i).getMovie().equals(movie)))
                 {
-                return Response.ok("Wrong SeatNr.,or the Seat is Occupied !").build();
+                return Response.ok("the Seat you have entered is Occupied !").build();
             }
                 if(!tickets.get(i).getMovie().equals(movie)){
                    int counter_=ticket.getCapatcity();
