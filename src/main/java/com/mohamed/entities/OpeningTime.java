@@ -7,7 +7,6 @@ import lombok.ToString;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,8 +15,8 @@ import java.time.LocalDateTime;
 public class OpeningTime extends PanacheEntity {
 
     private String Day;
-    private LocalDateTime openTime;
-    private LocalDateTime closeTime;
+    private String openTime;
+    private String closeTime;
     @ManyToOne
     private Cinema cinema;
 }

@@ -1,6 +1,5 @@
 package com.mohamed.endpoints;
 
-import com.github.javafaker.Faker;
 import com.mohamed.entities.Cinema;
 import com.mohamed.entities.Movie;
 import com.mohamed.exceptions.ResourceNotFound;
@@ -15,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Path("/api")
@@ -50,5 +50,20 @@ public class Movieendpoints {
     public Response findMoviesByKeyword(@PathParam("searchKey")String keyword){
         List<Movie> movieList=movieRepository.listAll().stream().filter(movie -> movie.getMovieName().startsWith(keyword)).collect(Collectors.toList());
         return Response.ok(movieList).build();
+    }
+    @GET
+    @Path("/findMovieByGenre/{genre}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public List<Movie> findMovieByGenre(@PathParam("genre")Genre genre)throws ResourceNotFound{
+        Predicate<Movie>moviePredicate=movie -> {
+            return movie.getGenre().equals(genre);
+        };
+
+        List<Movie>movies=movieRepository.listAll();
+        if(movies.isEmpty()){
+            throw new ResourceNotFound("List is Empty");
+        }
+        return movies.stream().filter(moviePredicate).collect(Collectors.toList());
     }
 }

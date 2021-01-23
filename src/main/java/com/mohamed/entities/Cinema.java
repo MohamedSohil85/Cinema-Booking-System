@@ -26,7 +26,8 @@ public class Cinema extends PanacheEntity {
     private LocalDateTime close;
     @OneToMany(mappedBy = "cinema",cascade = CascadeType.ALL)
     private List<Movie> movies;
-
+    @OneToMany
+    private List<OpeningTime>openingTimes;
 
 
 
