@@ -14,9 +14,14 @@ import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 @Path("/api")
@@ -91,5 +96,19 @@ public class Visitorendpoints {
             throw new ResourceNotFound("List is Empty");
         }
         return visitors;
+    }
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/VisitorByName/{name}")
+    public List<Visitor>getVisitorByName(@PathParam("name")String name) throws ResourceNotFound, InterruptedException, ExecutionException, TimeoutException {
+
+        List<Visitor> visitors = visitorRepository.stream("from Visitor", Sort.descending("lastname")).collect(Collectors.toList());
+        List<Visitor> completableFuture=CompletableFuture
+                .supplyAsync(()->visitors).thenApplyAsync(visitor -> {
+                    return visitor.stream().filter(visitor1 -> visitor1.getLastName().startsWith(name)).collect(Collectors.toList());
+                }).get(2, TimeUnit.SECONDS);
+        return completableFuture;
+
     }
 }

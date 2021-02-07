@@ -49,5 +49,15 @@ public class ActorEndpoints {
         Actors actor=Actors.find("actorName",name).singleResult();
         return actor;
     }
-
+   @GET
+   @Path("/Actors")
+   @Produces(MediaType.APPLICATION_JSON)
+   @Consumes(MediaType.APPLICATION_JSON)
+   public List<Actors> loadActors()throws ResourceNotFound{
+      List<Actors>actorsList=actorRepository.listAll();
+      if (actorsList.isEmpty()){
+          throw new ResourceNotFound("List is Empty");
+      }
+      return actorsList;
+   }
 }
