@@ -39,7 +39,7 @@ public class OrderEndpoints {
     @Inject
     PaymentRepository paymentRepository;
 
-    @Path("/sellTicket/{ticketId}/Payment/{paymentId}")
+    @Path("/buyTicket/{ticketId}/Payment/{paymentId}")
     @Transactional
     @POST
     @Produces(MediaType.APPLICATION_JSON)
