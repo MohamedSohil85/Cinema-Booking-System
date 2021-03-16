@@ -27,6 +27,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -64,6 +65,7 @@ public class Ticketendpoints {
         Visitor visitor = visitorRepository.findByIdOptional(visitorId)
                 .orElseThrow(() -> new ResourceNotFound("Object not found"));
         List<Ticket> tickets = ticketRepository.listAll();
+        int sum_ = 0;
         int counter = Constants.capacity;
         for (int i = 0; i < tickets.size(); i++) {
             if ((ticket.getRow() > Constants.row_number) || (ticket.getSeatNumber() > Constants.seat_number_per_row)) {
@@ -82,7 +84,10 @@ public class Ticketendpoints {
 
                 counter--;
             ticket.setCapatcity(counter);
+
+
         }
+
         ticket.setSeatStatus(SeatStatus.occupied);
         visitor.getTickets().add(ticket);
         movie.getTickets().add(ticket);
@@ -128,6 +133,19 @@ public class Ticketendpoints {
             throw new ResourceNotFound("Empty list");
         }
         return tickets;
+    }
+
+    @GET
+    @Path("/checkTicketByVisitorId/{visitorId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Long countTicket(@PathParam("visitorId") Long visitorId) throws ResourceNotFound {
+        Optional<Visitor> optionalVisitor = visitorRepository.findByIdOptional(visitorId);
+        if (optionalVisitor.isEmpty()) {
+            throw new ResourceNotFound("no Object with Id :" + visitorId);
+        }
+        Long countVisitor = ticketRepository.count("visitor_id", visitorId);
+        return countVisitor;
     }
 
 }
