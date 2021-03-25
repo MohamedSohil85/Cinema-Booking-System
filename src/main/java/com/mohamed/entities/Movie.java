@@ -34,6 +34,8 @@ public class Movie extends PanacheEntity {
     @OneToMany(mappedBy = "movie",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Actors> starring;
+    @OneToMany
+    List<Review>reviews;
     @ManyToOne
     @JsonIgnore
     private Cinema cinema;
