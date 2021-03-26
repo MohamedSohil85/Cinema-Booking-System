@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 @Path("/api")
@@ -62,5 +62,14 @@ public List<Review> showReviewsofMovie(@PathParam("movieName")String name)throws
      }
 
      return reviews.stream().filter(review -> review.getMovie().getMovieName().equalsIgnoreCase(name)).sorted().collect(Collectors.toList());
+}
+@Path("/averageOfMovie/{id}")
+@GET
+@Produces(value = MediaType.APPLICATION_JSON)
+public OptionalDouble getReviewById(@PathParam("id")Long id){
+    List<Review>reviews=reviewsRepository.listAll();
+    return reviews.stream()
+            .filter(review -> review.getMovie().id.equals(id))
+            .mapToDouble(Review::getRating).average();
 }
 }
