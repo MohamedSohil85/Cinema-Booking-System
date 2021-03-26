@@ -15,6 +15,7 @@ import javax.ws.rs.core.Response;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Path("/api")
@@ -53,12 +54,13 @@ public Response saveReview(@Valid Review review, @PathParam("movieId")Long id){
 @Path("/Reviews/{movieName}")
 @GET
 @Produces(value = MediaType.APPLICATION_JSON)
-public List<Movie> showReviewsofMovie(@PathParam("movieName")String name)throws ResourceNotFound{
+public List<Review> showReviewsofMovie(@PathParam("movieName")String name)throws ResourceNotFound{
      List<Review>reviews=reviewsRepository.listAll();
+     List<Movie>movies=movieRepository.listAll();
      if (reviews.isEmpty()){
          throw new ResourceNotFound("no Reviews");
      }
-     return reviews.stream().map(Review::getMovie).filter(movie -> movie.getMovieName().equalsIgnoreCase(name)).sorted().collect(Collectors.toList());
 
+     return reviews.stream().filter(review -> review.getMovie().getMovieName().equalsIgnoreCase(name)).sorted().collect(Collectors.toList());
 }
 }
